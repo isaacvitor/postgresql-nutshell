@@ -1,13 +1,12 @@
 @echo off
 
-REM Parar containers se estiverem rodando
+REM Stop containers if they are running
 docker-compose down postgres pgadmin
 
-REM Criar diretórios necessários
-mkdir postgres\conf 2>nul
+REM Create necessary directories
 mkdir postgres\data 2>nul
 
-REM Criar arquivo de configuração do pgAdmin
+REM Create pgAdmin configuration file
 (
 echo {
 echo   "Servers": {
@@ -25,7 +24,7 @@ echo   }
 echo }
 ) > postgres\servers.json
 
-REM Criar arquivo de senhas do pgAdmin
+REM Create pgAdmin password file
 echo postgres:5432:*:postgres:postgres > postgres\pgpass
 
-echo Diretórios e arquivos criados com sucesso!
+echo Directories and files created successfully!

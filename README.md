@@ -76,6 +76,29 @@ docker-compose logs pgadmin
 docker-compose restart
 ```
 
+### 🧹 Cleanup (Complete removal)
+
+To completely remove all containers, volumes, and data created by this project:
+
+#### On Linux/macOS:
+
+```bash
+# Give execution permission to the cleanup script
+chmod +x cleanup.sh
+
+# Run the cleanup script
+./cleanup.sh
+```
+
+#### On Windows:
+
+```cmd
+# Run the cleanup script
+cleanup.bat
+```
+
+**⚠️ WARNING**: The cleanup scripts will permanently delete all PostgreSQL data and configurations. Use with caution!
+
 ## 📁 Project structure
 
 ```
@@ -83,6 +106,8 @@ postgresql-nutshell/
 ├── docker-compose.yml      # Container configuration
 ├── setup.sh               # Setup script for Linux/macOS
 ├── setup.bat              # Setup script for Windows
+├── cleanup.sh             # Cleanup script for Linux/macOS
+├── cleanup.bat            # Cleanup script for Windows
 ├── postgres/
 │   ├── data/              # PostgreSQL data (created automatically)
 │   ├── conf/              # PostgreSQL configurations (created automatically)
@@ -98,11 +123,14 @@ postgresql-nutshell/
 The `.sh` scripts need execution permission:
 
 ```bash
-# Give execution permission
+# Give execution permission to setup script
 chmod +x setup.sh
 
+# Give execution permission to cleanup script
+chmod +x cleanup.sh
+
 # Check permissions
-ls -la setup.sh
+ls -la setup.sh cleanup.sh
 ```
 
 ### Windows
