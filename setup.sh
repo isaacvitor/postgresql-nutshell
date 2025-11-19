@@ -1,13 +1,12 @@
 #!/bin/bash
 
-# Parar containers se estiverem rodando
+# Stop containers if they are running
 docker-compose down postgres pgadmin
 
-# Criar diretórios necessários
-mkdir -p postgres/conf
+# Create necessary directories
 mkdir -p postgres/data
 
-# Criar arquivo de configuração do pgAdmin
+# Create pgAdmin configuration file
 cat > postgres/servers.json << EOF
 {
   "Servers": {
@@ -25,8 +24,8 @@ cat > postgres/servers.json << EOF
 }
 EOF
 
-# Criar arquivo de senhas do pgAdmin
+# Create pgAdmin password file
 echo "postgres:5432:*:postgres:postgres" > postgres/pgpass
 chmod 600 postgres/pgpass
 
-echo "Diretórios e arquivos criados com sucesso!"
+echo "Directories and files created successfully!"
