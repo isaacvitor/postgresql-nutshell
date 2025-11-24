@@ -22,7 +22,7 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: 'False'
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     ports:
-      - "8080:80"
+      - "8088:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - ./postgres/servers.json:/pgadmin4/servers.json:ro

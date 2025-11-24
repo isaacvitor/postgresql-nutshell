@@ -52,7 +52,7 @@ docker-compose up
   - Password: `postgres`
   - Database: `postgres`
 
-- **pgAdmin**: http://localhost:8080
+- **pgAdmin**: http://localhost:8088
   - Email: `admin@admin.com`
   - Password: `postgres`
 
@@ -156,12 +156,12 @@ To customize the configurations, edit the `docker-compose.yml` file:
 ## 🆘 Troubleshooting
 
 ### Port already in use
-If ports 5432 or 8080 are already in use, change them in `docker-compose.yml`:
+If ports 5432 or 8088 are already in use, change them in `docker-compose.yml`:
 
 ```yaml
 ports:
   - "5433:5432"  # PostgreSQL on port 5433
-  - "8081:80"    # pgAdmin on port 8081
+  - "8089:80"    # pgAdmin on port 8089
 ```
 
 ### Permission issues
