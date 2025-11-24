@@ -54,10 +54,13 @@ SELECT
 	attname, -- Column name
     null_frac, -- Fraction of NULL values
 	avg_width as bytes_per_row, -- Average width in bytes
-    n_distinct, -- Number of disinct values (negative means a percentage of total rows, positive means exact count, e.g., -0.5 means 50% of total rows, 100 means exactly 100 distinct values)
+    n_distinct, -- Number of disinct values (negative means a percentage of total rows, positive means exact count, e.g., -0.5 means 50% of total rows, 100 means exactly 100 distinct values) Cardinality
+    most_common_vals, -- Most common values in the column
+    most_common_freqs, -- Frequencies of the most common values
+    histogram_bounds, -- Histogram bounds for the column
 	correlation -- Correlation coefficient between physical order and logical order (Values close to 1 or -1 indicate good correlation, values close to 0 indicate poor correlation)
 FROM pg_stats
-WHERE tablename = 'gin_jsonb_test' AND schemaname = 'public';
+WHERE tablename = 'table_name' AND schemaname = 'public';
 
 -- 2. Using pg_stat_all_tables
 SELECT
@@ -73,7 +76,7 @@ SELECT
     last_analyze, -- Last manual analyze
     last_autoanalyze -- Last autoanalyze
 FROM pg_stat_all_tables
-WHERE relname = 'gin_jsonb_test';
+WHERE relname = 'table_name';
 
 -- 3. Using pg_class
 SELECT
@@ -83,7 +86,7 @@ SELECT
     pg_size_pretty(pg_table_size(relname::regclass)) AS table_size,
     pg_size_pretty(pg_total_relation_size(relname::regclass)) AS total_size
 FROM pg_class
-WHERE relname = 'gin_jsonb_test';
+WHERE relname = 'table_name';
 
 -- 4. Using pg_stat_user_tables
 SELECT
@@ -100,7 +103,7 @@ SELECT
     last_analyze, -- Last manual analyze
     last_autoanalyze -- Last autoanalyze
 FROM pg_stat_user_tables
-WHERE relname = 'gin_jsonb_test';
+WHERE relname = 'table_name';
 
 -- Table owner
 SELECT
@@ -137,7 +140,7 @@ ORDER BY
 	pg_column_size(column_name) DESC
 LIMIT 10;
 
--- More detailed statistics on JSONB column storage
+-- More detailed statistics on JSONB column storage - TAKE CARE WITH LARGE TABLES
 SELECT
 	min(pg_column_size(column_name)) as min_bytes,
 	max(pg_column_size(column_name)) as max_bytes,
@@ -147,7 +150,7 @@ SELECT
 FROM
 	table_name;
 
--- TOAST table size breakdown
+-- TOAST table size breakdown - TAKE CARE WITH LARGE TABLES
 SELECT
 	pg_size_pretty(pg_total_relation_size('table_name')) as total_size,
 	pg_size_pretty(pg_relation_size('table_name')) as main_table,
@@ -203,6 +206,41 @@ SHOW autovacuum;
 SHOW autovacuum_vacuum_threshold;
 SHOW autovacuum_vacuum_scale_factor;
 
+---------------------------------
+-- SCANS
+---------------------------------
+-- Scans básicos
+SHOW enable_seqscan;        -- Sequencial scan
+SHOW enable_indexscan;      -- Index scan (inclui GIN, GiST, B-tree, etc.)
+SHOW enable_indexonlyscan;  -- Index-only scan
+SHOW enable_bitmapscan;     -- Bitmap scan (usado com GIN)
+SHOW enable_tidscan;        -- TID scan
+
+-- Joins
+SHOW enable_hashjoin;       -- Hash join
+SHOW enable_mergejoin;      -- Merge join  
+SHOW enable_nestloop;       -- Nested loop join
+
+-- Agregações
+SHOW enable_hashagg;        -- Hash aggregation
+SHOW enable_sort;           -- Ordenação
+SHOW enable_material;       -- Materialização
+
+
+-------------------------------
+-- JSONB
+-------------------------------
+-- JSONB
+-- Basic syntax:
+-- jsonb_column @> jsonb_value
+-- Examples:
+SELECT * FROM table_name WHERE jsonb_column @> '{"key": "value"}';
+
+
+SHOW default_toast_compression;
+SELECT name, setting, enumvals 
+FROM pg_settings 
+WHERE name = 'default_toast_compression';
 
 --- PSQL
 -- docker exec -it [container_name] psql -U postgres

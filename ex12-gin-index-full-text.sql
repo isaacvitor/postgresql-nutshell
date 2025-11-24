@@ -22,7 +22,7 @@ CREATE TABLE gin_fulltext_test (
 -- Insert sample data with various text content
 INSERT INTO gin_fulltext_test (title, content, author, category) 
 SELECT 
-    'Article ' || generate_series(1, 5000) || ': ' ||
+    'Article ' || generate_series(1, 50000) || ': ' ||
     CASE (random() * 4)::integer
         WHEN 0 THEN 'PostgreSQL Database Performance'
         WHEN 1 THEN 'Advanced SQL Techniques'
@@ -48,8 +48,20 @@ SELECT
         ELSE 'Administration'
     END;
 
+-- Show some random data samples before updating search_vector
+SELECT id, title, left(content, 100) AS content_snippet, search_vector
+FROM gin_fulltext_test
+ORDER BY random()
+LIMIT 5;
+
 -- Update the search_vector column with tsvector data
 UPDATE gin_fulltext_test SET search_vector = to_tsvector('english', title || ' ' || content);
+
+-- Show some random data samples after updating search_vector
+SELECT id, title, left(content, 100) AS content_snippet, search_vector
+FROM gin_fulltext_test
+ORDER BY random()
+LIMIT 5;
 
 -- Update table statistics
 ANALYZE gin_fulltext_test;
@@ -93,8 +105,10 @@ EXPLAIN ANALYZE SELECT * FROM gin_fulltext_test
 WHERE search_vector @@ to_tsquery('english', 'database & performance');
 
 -- OR operation
+SET enable_seqscan = off;
 EXPLAIN ANALYZE SELECT * FROM gin_fulltext_test 
 WHERE search_vector @@ to_tsquery('english', 'PostgreSQL | MySQL');
+SET enable_seqscan = on;
 
 -- NOT operation
 EXPLAIN ANALYZE SELECT * FROM gin_fulltext_test 
@@ -147,14 +161,29 @@ ORDER BY postgresql_articles DESC;
 -- Show index usage statistics
 SELECT 
     schemaname,
-    tablename,
-    indexname,
+    relname AS table_name,
+    indexrelname,
     idx_scan AS index_scans,
     idx_tup_read AS tuples_read,
     idx_tup_fetch AS tuples_fetched
 FROM pg_stat_user_indexes 
-WHERE tablename = 'gin_fulltext_test'
+WHERE relname = 'gin_fulltext_test'
 ORDER BY idx_scan DESC;
+
+SELECT
+    relname AS table_name,
+    seq_scan, -- Sesquential scans
+    seq_tup_read, -- Sesquential tuples read
+    idx_scan, -- Index scan
+    idx_tup_fetch, -- Index tuples fetched
+    n_live_tup, -- Live tuples
+    n_dead_tup, -- Dead tuples
+    last_vacuum, -- Last manual vacuum
+    last_autovacuum, -- Last autovacuum
+    last_analyze, -- Last manual analyze
+    last_autoanalyze -- Last autoanalyze
+FROM pg_stat_all_tables
+WHERE relname = 'gin_fulltext_test';
 
 -- Demonstrate different text search configurations
 -- Create indexes for different languages
