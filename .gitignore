@@ -1,3 +1,5 @@
 postgres/*
 *.csv
 *.png
+bench.py
+plotter.py

@@ -4,22 +4,23 @@
 -- to analyze the performance of JSONB operators in PostgreSQL.
 DROP TABLE IF EXISTS test_jsonb_nesting;
 
--- CREATE TABLE test_jsonb_nesting AS
--- SELECT (id / 10000) AS size,
---        (id / 1000) % 10 AS level,
---        (
---          repeat('{"obj": ', (id / 1000) % 10) ||
---          jsonb_build_object('key', id, 'long_str', repeat('x', (id / 10000) * 100)) ||
---          repeat('}', (id / 1000) % 10)
---        )::jsonb AS jb
--- FROM generate_series(0, 100000) id;
 
-CREATE TABLE test_jsonb_nesting AS 
-SELECT id / 10 size, id % 10 level, 
-  (repeat('{"obj": ', id % 10) || jsonb_build_object('key', id, 'long_str', str) || repeat('}', id % 10))::jsonb jb 
-  FROM 
-  generate_series(0, 1200) id, 
-  repeat('a', pow(10, id / 200.0)::int) str;
+CREATE TABLE test_jsonb_nesting AS
+SELECT
+  id,
+  (id / 10) AS size,
+  (id % 10) AS level,
+  (
+    repeat('{"obj": ', id % 10)
+    || jsonb_build_object(
+         'key', id,
+         'long_str', repeat('a', (pow(10, id::float / 200.0))::int)
+       )::text
+    || repeat('}', id % 10)
+  )::jsonb AS jb
+FROM generate_series(0, 1200) AS id;
+
+
 
 -- Let's see some random samples
 SELECT * FROM test_jsonb_nesting
