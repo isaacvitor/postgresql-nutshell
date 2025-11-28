@@ -5,6 +5,11 @@
 
 It includes a complete PostgreSQL environment with pgAdmin using Docker Compose for development and learning.
 
+## 📖 Presentation
+
+The complete presentation is available in PDF format: [PostgreSQL in a nutshell](docs/postgresql-nutshell-presentation.pdf)
+
+
 ## 📋 Prerequisites
 
 - Docker
