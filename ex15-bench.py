@@ -18,7 +18,7 @@ DB = {
 
 OUT_CSV = "ex15-bench_results.csv"
 N_RUNS = 5
-SAMPLE_FOR_BYTES = 3  # quantos registros para estimar octet_length / pg_column_size
+SAMPLE_FOR_BYTES = 3  # how many records to estimate octet_length / pg_column_size
 
 def main():
     conn = psycopg2.connect(**DB)
@@ -111,7 +111,7 @@ def main():
             })
             print(f"size={size} lvl={level} op={op_name} median_ms={median_exec} raw_bytes={bytes_raw} stored={bytes_stored}")
 
-    # salvar CSV
+    # Save CSV
     fieldnames = ['size_index','bytes_raw','bytes_stored','level','operator','execution_time_ms_median','runs']
     with open(OUT_CSV, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)

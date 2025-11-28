@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # plot_pgconf_style.py
-# Requisitos: pip install pandas matplotlib numpy
+# Requires: pip install pandas matplotlib numpy
 
 import pandas as pd
 import numpy as np
@@ -25,11 +25,11 @@ if csv_path is None:
 df = pd.read_csv(csv_path)
 print(f"Loaded {csv_path} with {len(df)} rows")
 
-# Prefer 'bytes_raw'. Se não existir, fallback para mapeamento log (menos ideal).
+# Prefer 'bytes_raw'. If not present, fallback to log mapping (less ideal).
 if 'bytes_raw' in df.columns and not df['bytes_raw'].isnull().all():
     df['bytes'] = df['bytes_raw'].astype(float)
 else:
-    # fallback: mapear size_index para [100..1_000_000]
+    # fallback: map size_index to [100..1_000_000]
     if 'size' in df.columns:
         size_col = 'size'
     elif 'size_index' in df.columns:
@@ -46,7 +46,7 @@ else:
         )
     )
 
-# tempo: pegar coluna correta e converter ms -> µs
+# time: get correct column and convert ms -> µs
 if 'execution_time_ms_median' in df.columns:
     df['time_ms'] = df['execution_time_ms_median'].astype(float)
 elif 'execution_time' in df.columns:
@@ -56,7 +56,7 @@ else:
 
 df['time_us'] = df['time_ms'] * 1000.0
 
-# parâmetros do plot
+# plot parameters
 operators = ['arrow', 'path', 'subscript', 'jsonpath']
 titles = {
     'arrow': '-> operator',
@@ -77,7 +77,7 @@ cmap = plt.get_cmap("viridis")
 mappable = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
 mappable.set_array([])
 
-# Y ticks: incluir 0.1 -> 10^(-1)..10^max
+# Y ticks: include 0.1 -> 10^(-1)..10^max
 max_time = df['time_us'].replace([np.inf, -np.inf], np.nan).dropna().max()
 if np.isnan(max_time) or max_time <= 0:
     max_power = 3

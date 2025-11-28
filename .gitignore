@@ -3,3 +3,4 @@ postgres/*
 *.png
 bench.py
 plotter.py
+test.sql
